@@ -64,7 +64,7 @@ public class UserController {
 		}).orElseThrow(() -> new ResourceNotFoundException("User_id" + user_id +"not found"));
 	}
 	
-	@DeleteMapping("/user/{id}")
+	@DeleteMapping("/user/{user_id}")
 	public ResponseEntity<?> deleteUSer(@PathVariable long user_id){
 		return users.findById(user_id).map(user -> {users.delete(user); return ResponseEntity.ok().build();
 				}).orElseThrow(() -> new ResourceNotFoundException("id" + user_id +"not found"));
