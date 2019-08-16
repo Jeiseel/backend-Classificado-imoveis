@@ -7,7 +7,9 @@ import javax.validation.constraints.Size;
 @Entity
 public class Property extends AbstractEntity {
 
-    @Id
+	private static final long serialVersionUID = 1L;
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
