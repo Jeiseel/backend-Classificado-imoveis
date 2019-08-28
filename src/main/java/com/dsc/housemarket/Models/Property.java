@@ -30,7 +30,7 @@ public class Property extends AbstractEntity {
     @Size(max = 300)
     @NotEmpty
     @Column
-    private String superdescription;
+    private String superDescription;
 
     @NotEmpty
     @Column
@@ -73,11 +73,11 @@ public class Property extends AbstractEntity {
     }
 
     public String getSuperdescription() {
-        return superdescription;
+        return superDescription;
     }
 
     public void setSuperdescription(String superdescription) {
-        this.superdescription = superdescription;
+        this.superDescription = superdescription;
     }
 
     public Feature getFeatures() {
