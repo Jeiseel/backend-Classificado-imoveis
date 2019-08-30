@@ -7,13 +7,7 @@ import javax.validation.constraints.Size;
 @Entity
 public class Feature extends AbstractEntity {
 
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     private long id;
 
     @Size(max = 256)
@@ -30,14 +24,6 @@ public class Feature extends AbstractEntity {
     @NotEmpty
     @Column
     private int rooms;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 
     public String getType() {
         return type;
@@ -62,4 +48,15 @@ public class Feature extends AbstractEntity {
     public void setRooms(int rooms) {
         this.rooms = rooms;
     }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(long id) {
+        this.id = id;
+    }
 }
+

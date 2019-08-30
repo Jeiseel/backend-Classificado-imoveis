@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,48 +26,65 @@ import com.dsc.housemarket.Repository.UserRepository;
 import com.dsc.housemarket.Exception.ResourceNotFoundException;
 
 @RestController
-@RequestMapping("/user")
-@CrossOrigin(origins = "*")
+@RequestMapping("user")
 public class UserController {
 
+	private final UserRepository userDAO;
+
 	@Autowired
-	private UserRepository users;
-	
+	public UserController(UserRepository userDAO) { this.userDAO = userDAO;	}
+
 	@GetMapping
-	private List<User>list(){
-		return users.findAll();
+	public ResponseEntity<?> listAll(){
+		return new ResponseEntity<>(userDAO.findAll(), HttpStatus.OK);
 	}
 	
-	@GetMapping("/{user_id}")
-	private ResponseEntity <User> searchById(@PathVariable long user_id){
-		Optional<User> user = users.findById(user_id);
-		return user.isPresent() ? ResponseEntity.ok(user.get()): ResponseEntity.notFound().build();
+	@GetMapping("/{id}")
+	public ResponseEntity<?> searchById(@PathVariable long id){
+		Optional<User> user = userDAO.findById(id);
+		if(!user.equals(Optional.empty())) { return new ResponseEntity<>(user, HttpStatus.OK); }
+		return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
 	}
 	
 	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public User addUser(@RequestBody User user) {
-		Optional<User> currentUser = users.findByName(user.getName());
-		if(currentUser.isPresent())
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, " -- > Already Registered User < --");
-		return users.save(user);
+	public ResponseEntity<?> addUser(@RequestBody User user) {
+		Optional<User> currentUser = userDAO.findByEmail(user.getEmail());
+		if(!currentUser.equals(Optional.empty()))
+				return new ResponseEntity<>("The Email is already Registered", HttpStatus.UNPROCESSABLE_ENTITY);
+		return new ResponseEntity<>(userDAO.save(user), HttpStatus.CREATED);
 	}
 	
-	@PutMapping("/user/{user_id}")
-	public User updateUser(@PathVariable long user_id, @Valid @RequestBody User userRequest) {
-		return (User) users.findById(user_id).map( user -> {
-			user.setName(user.getName());
-			user.setEmail(user.getEmail());
-			user.setPassword(user.getPassword());
-			user.setPhone(user.getPhone());
-			
-			return users.save(user);
-		}).orElseThrow(() -> new ResourceNotFoundException("User_id" + user_id +"not found"));
+	@PutMapping("/user/{id}")
+	public ResponseEntity<?> updateUser(@PathVariable("id") long id, @Valid @RequestBody User userRequest) {
+		Optional<User> existingUser = userDAO.findById(id);
+		if(existingUser.equals(Optional.empty())) {
+			return new ResponseEntity<>("This User Don't exists", HttpStatus.NOT_FOUND);
+		}
+
+		if (existingUser.get().getName() != null) {
+			existingUser.get().setName(userRequest.getName());
+		}
+		if (existingUser.get().getEmail() != null) {
+			existingUser.get().setEmail(userRequest.getEmail());
+		}
+		if (existingUser.get().getPhone() != null) {
+			existingUser.get().setPhone(userRequest.getPhone());
+		}
+
+		userDAO.save(existingUser.get());
+
+		return new ResponseEntity<>("User has been updated", HttpStatus.OK);
 	}
 	
-	@DeleteMapping("/user/{id}")
+	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteUSer(@PathVariable long id){
-		return users.findById(id).map(user -> {users.delete(user); return ResponseEntity.ok().build();
-				}).orElseThrow(() -> new ResourceNotFoundException("id" + id +"not found"));
+
+		Boolean existsUser = userDAO.existsById(id);
+
+		if(!existsUser) { return new ResponseEntity<>("This User don't exists", HttpStatus.NOT_FOUND); }
+
+		userDAO.deleteById(id);
+
+		return new ResponseEntity<>("The User has been deleted", HttpStatus.OK);
 	}
 }

@@ -10,13 +10,7 @@ import javax.validation.constraints.NotEmpty;
 @Entity
 public class Photo extends AbstractEntity {
 
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     private long id;
 
     @NotEmpty
@@ -26,14 +20,6 @@ public class Photo extends AbstractEntity {
     @NotEmpty
     @Column
     private String path;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 
     public long getPropertyId() {
         return propertyId;
@@ -49,5 +35,15 @@ public class Photo extends AbstractEntity {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(long id) {
+        this.id = id;
     }
 }

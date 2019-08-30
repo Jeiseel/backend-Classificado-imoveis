@@ -14,6 +14,7 @@ import com.dsc.housemarket.Services.UserService;
 //classe que ultiliza os serviços da interface user service.
 
 @Service
+/*
 public class UserServiceIpml implements UserService {
 	
 	@Autowired
@@ -40,14 +41,20 @@ public class UserServiceIpml implements UserService {
 	}
 	
 	// Metodo para paginação, listando os dados por paginas.
-	@SuppressWarnings("deprecation")
+	//@SuppressWarnings("deprecation")
+
+
 	@Override
 	public Page<User> findAll(int page, int count){
 		Pageable pages = new PageRequest(page, count);
-		return this.userRepository.findAll(pages);
+		return (Page<User>) this.userRepository.findAll(pages);
 	}
+
 	
 	
 	
 
 }
+
+ */
+public class UserServiceIpml{}
