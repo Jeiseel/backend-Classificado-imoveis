@@ -15,7 +15,6 @@ public class Property extends AbstractEntity {
     @Column
     private String name;
 
-    @NotEmpty
     @Column
     private float value;
 
@@ -29,13 +28,12 @@ public class Property extends AbstractEntity {
     @Column
     private String superDescription;
 
-    @NotEmpty
     @Column
     private Feature features;
 
-    @NotEmpty
     @Column
-    private Photo photos;
+    @NotEmpty
+    private String photos;
 
     public String getName() {
         return name;
@@ -77,11 +75,11 @@ public class Property extends AbstractEntity {
         this.features = features;
     }
 
-    public Photo getPhotos() {
+    public String getPhotos() {
         return photos;
     }
 
-    public void setPhotos(Photo photos) {
+    public void setPhotos(String photos) {
         this.photos = photos;
     }
 

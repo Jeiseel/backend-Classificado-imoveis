@@ -1,10 +1,10 @@
 package com.dsc.housemarket.Controller;
 
-import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
 
+import com.dsc.housemarket.Repository.FeatureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,11 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
-import com.dsc.housemarket.Exception.ResourceNotFoundException;
 import com.dsc.housemarket.Models.Property;
 import com.dsc.housemarket.Repository.PropertyRepository;
 
@@ -27,51 +24,77 @@ import com.dsc.housemarket.Repository.PropertyRepository;
 @RequestMapping("/property")
 public class PropertyController {
 
-	private final PropertyRepository properties;
+	private final PropertyRepository propertiesDAO;
 
 	@Autowired
-	public PropertyController(PropertyRepository properties) {
-		this.properties = properties;
+	public PropertyController(PropertyRepository propertiesDAO, FeatureRepository featureDAO) {
+		this.propertiesDAO = propertiesDAO;
 	}
 
 	@GetMapping
-	private List<Property>list(){
-		return properties.findAll();
+	public ResponseEntity<?> listAll(){
+		return new ResponseEntity<>(propertiesDAO.findAll(), HttpStatus.OK);
 	}
 	
-	@GetMapping("/property_id")
-	private ResponseEntity <Property> seachById(@PathVariable long property_id){
-		Optional <Property> property = properties.findById(property_id);
-		return property.isPresent() ? ResponseEntity.ok(property.get()): ResponseEntity.notFound().build();
+	@GetMapping("/{id}")
+	private ResponseEntity<?> seachById(@PathVariable long id){
+		Optional<Property> property = propertiesDAO.findById(id);
+		if(!property.equals(Optional.empty())) { return new ResponseEntity<>(property, HttpStatus.OK); }
+		return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
 	}
 	
 	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public Property addProperty(@RequestBody Property property) {
-		Optional <Property> currentProperty = properties.findByName(property.getName());
+	public ResponseEntity<?> addProperty(@RequestBody Property property) {
+
+		Optional <Property> currentProperty = propertiesDAO.findByName(property.getName());
 		if(currentProperty.isPresent())
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, " -- > Already Registered Property < --");
-		return properties.save(property);
+				return new ResponseEntity<>(" -- > Already Registered Property < --", HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(propertiesDAO.save(property), HttpStatus.CREATED);
 	}
 	
-	@PutMapping("/property/{porperty_id}")
-	public Property updateProperty(@PathVariable long property_id, @Valid @RequestBody Property propertyRequest) {
-		return (Property) properties.findById(property_id).map(property -> {
-			property.setName(property.getName());
-			property.setPhotos(property.getPhotos());
-			property.setValue(property.getValue());
-			property.setFeatures(property.getFeatures());
-			property.setDescription(property.getDescription());
-			property.setSuperdescription(property.getSuperdescription());
-			return properties.save(property);
-		}).orElseThrow(()-> new ResourceNotFoundException(" Property_id " + property_id +" not found "));
+	@PutMapping("/{id}")
+	public ResponseEntity<?> updateProperty(@PathVariable long id, @Valid @RequestBody Property propertyRequest) {
+		Optional<Property> existsProperty = propertiesDAO.findById(id);
+
+		if(existsProperty.equals(Optional.empty())) {
+			return new ResponseEntity<>("This Property Don't exists", HttpStatus.NOT_FOUND);
+		}
+
+		if (propertyRequest.getName() != null) {
+			existsProperty.get().setName(propertyRequest.getName());
+		}
+		if (propertyRequest.getPhotos() != null) {
+			existsProperty.get().setPhotos(propertyRequest.getPhotos());
+		}
+		if (propertyRequest.getFeatures() != null) {
+			existsProperty.get().setFeatures(propertyRequest.getFeatures());
+		}
+		if (propertyRequest.getValue() == 0.0f) {
+			existsProperty.get().setValue(propertyRequest.getValue());
+		}
+		if (propertyRequest.getDescription() != null) {
+			existsProperty.get().setDescription(propertyRequest.getDescription());
+		}
+		if (propertyRequest.getSuperdescription() != null) {
+			existsProperty.get().setSuperdescription(propertyRequest.getSuperdescription());
+		}
+
+		propertiesDAO.save(existsProperty.get());
+
+		return new ResponseEntity<>("Property has been updated", HttpStatus.OK);
 		
 	}
 	
-	@DeleteMapping("/property/porperty_id")
-	public ResponseEntity<?> deleteProperty(@PathVariable long property_id){
-		return properties.findById(property_id).map(property -> {properties.delete(property); return ResponseEntity.ok().build();
-		}).orElseThrow(() -> new ResourceNotFoundException("ID" + property_id + "not found" ));
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> deleteProperty(@PathVariable long id){
+
+		Boolean existsProperty = propertiesDAO.existsById(id);
+
+		if(!existsProperty) { return new ResponseEntity<>("This Property don't exists", HttpStatus.NOT_FOUND); }
+
+		propertiesDAO.deleteById(id);
+
+		return new ResponseEntity<>("The Property has been deleted", HttpStatus.OK);
 	}
 	
 	

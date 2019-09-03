@@ -15,13 +15,9 @@ public class Feature extends AbstractEntity {
     @Column
     private String type;
 
-    @Size(max = 256)
-    @NotEmpty
     @Column
     private float area;
 
-    @Size(max = 256)
-    @NotEmpty
     @Column
     private int rooms;
 

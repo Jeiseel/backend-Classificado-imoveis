@@ -54,20 +54,20 @@ public class UserController {
 		return new ResponseEntity<>(userDAO.save(user), HttpStatus.CREATED);
 	}
 	
-	@PutMapping("/user/{id}")
+	@PutMapping("/{id}")
 	public ResponseEntity<?> updateUser(@PathVariable("id") long id, @Valid @RequestBody User userRequest) {
 		Optional<User> existingUser = userDAO.findById(id);
 		if(existingUser.equals(Optional.empty())) {
 			return new ResponseEntity<>("This User Don't exists", HttpStatus.NOT_FOUND);
 		}
 
-		if (existingUser.get().getName() != null) {
+		if (userRequest.getName() != null) {
 			existingUser.get().setName(userRequest.getName());
 		}
-		if (existingUser.get().getEmail() != null) {
+		if (userRequest.getEmail() != null) {
 			existingUser.get().setEmail(userRequest.getEmail());
 		}
-		if (existingUser.get().getPhone() != null) {
+		if (userRequest.getPhone() != null) {
 			existingUser.get().setPhone(userRequest.getPhone());
 		}
 
