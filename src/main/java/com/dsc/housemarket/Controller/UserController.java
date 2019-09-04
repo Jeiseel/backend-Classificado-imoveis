@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import com.dsc.housemarket.Services.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +52,10 @@ public class UserController {
 		Optional<User> currentUser = userDAO.findByEmail(user.getEmail());
 		if(!currentUser.equals(Optional.empty()))
 				return new ResponseEntity<>("The Email is already Registered", HttpStatus.UNPROCESSABLE_ENTITY);
+
+		String passwdEncrypted = PasswordEncoder.encodePassword(user.getPassword());
+		user.setPassword(passwdEncrypted);
+
 		return new ResponseEntity<>(userDAO.save(user), HttpStatus.CREATED);
 	}
 	

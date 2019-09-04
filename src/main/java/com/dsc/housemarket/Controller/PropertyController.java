@@ -96,17 +96,4 @@ public class PropertyController {
 
 		return new ResponseEntity<>("The Property has been deleted", HttpStatus.OK);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }

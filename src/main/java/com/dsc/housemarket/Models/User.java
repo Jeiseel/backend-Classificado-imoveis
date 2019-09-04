@@ -1,5 +1,7 @@
 package com.dsc.housemarket.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
@@ -18,13 +20,11 @@ public class User {
 	
 	@Size(max = 80)
 	@NotEmpty
-	@Column
+	@Column(unique = true)
 	private String email;
-	
-	@Size(max = 20)
-	//@Size(min = 8)
+
 	@NotEmpty
-	@Column
+	//@JsonIgnore
 	private String password;
 	
 	@Size(max = 11)
