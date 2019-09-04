@@ -1,16 +1,13 @@
 package com.dsc.housemarket.Controller;
 
-import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
 
-import com.dsc.housemarket.Services.PasswordEncoder;
+import com.dsc.housemarket.SecurityConfiguration.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,13 +15,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.dsc.housemarket.Models.User;
 import com.dsc.housemarket.Repository.UserRepository;
-import com.dsc.housemarket.Exception.ResourceNotFoundException;
 
 @RestController
 @RequestMapping("user")
@@ -37,7 +31,12 @@ public class UserController {
 
 	@GetMapping
 	public ResponseEntity<?> listAll(){
-		return new ResponseEntity<>(userDAO.findAll(), HttpStatus.OK);
+
+		Iterable<User> users = userDAO.findAll();
+
+		for (User user: users) { user.setPassword(null); }
+
+		return new ResponseEntity<>(users, HttpStatus.OK);
 	}
 	
 	@GetMapping("/{id}")
@@ -55,6 +54,8 @@ public class UserController {
 
 		String passwdEncrypted = PasswordEncoder.encodePassword(user.getPassword());
 		user.setPassword(passwdEncrypted);
+
+		user.setAdmin(false);
 
 		return new ResponseEntity<>(userDAO.save(user), HttpStatus.CREATED);
 	}
@@ -75,6 +76,8 @@ public class UserController {
 		if (userRequest.getPhone() != null) {
 			existingUser.get().setPhone(userRequest.getPhone());
 		}
+
+		existingUser.get().setAdmin(false);
 
 		userDAO.save(existingUser.get());
 

@@ -13,24 +13,20 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
-	@Size(max = 80)
 	@NotEmpty
-	@Column
 	private String name;
-	
-	@Size(max = 80)
+
 	@NotEmpty
 	@Column(unique = true)
 	private String email;
 
 	@NotEmpty
-	//@JsonIgnore
 	private String password;
-	
-	@Size(max = 11)
+
 	@NotEmpty
-	@Column
 	private String phone;
+
+	private boolean admin = false;
 	
 	public String getName() {
 		return name;
@@ -70,5 +66,13 @@ public class User {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public boolean isAdmin() {
+		return admin;
+	}
+
+	public void setAdmin(boolean admin) {
+		this.admin = admin;
 	}
 }

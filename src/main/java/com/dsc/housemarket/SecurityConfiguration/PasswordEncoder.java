@@ -1,4 +1,4 @@
-package com.dsc.housemarket.Services;
+package com.dsc.housemarket.SecurityConfiguration;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
