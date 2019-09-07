@@ -8,6 +8,7 @@ import javax.validation.constraints.Size;
 public class Feature extends AbstractEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Size(max = 256)

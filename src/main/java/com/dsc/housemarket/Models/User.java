@@ -1,10 +1,8 @@
 package com.dsc.housemarket.Models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 public class User {
@@ -25,6 +23,10 @@ public class User {
 
 	@NotEmpty
 	private String phone;
+
+	@Column
+	@ManyToMany
+	private List<Property> propertyList;
 
 	private boolean admin = false;
 	
@@ -74,5 +76,13 @@ public class User {
 
 	public void setAdmin(boolean admin) {
 		this.admin = admin;
+	}
+
+	public List<Property> getPropertyList() {
+		return propertyList;
+	}
+
+	public void addProperty(Property property) {
+		this.propertyList.add(property);
 	}
 }

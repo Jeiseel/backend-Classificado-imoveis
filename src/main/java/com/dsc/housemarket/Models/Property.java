@@ -8,6 +8,7 @@ import javax.validation.constraints.Size;
 public class Property extends AbstractEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Size(max = 256)
@@ -34,6 +35,18 @@ public class Property extends AbstractEntity {
     @Column
     @NotEmpty
     private String photos;
+
+    @Column
+    @NotEmpty
+    private String creator;
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
 
     public String getName() {
         return name;

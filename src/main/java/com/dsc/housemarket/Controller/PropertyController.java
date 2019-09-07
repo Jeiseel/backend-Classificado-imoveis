@@ -4,10 +4,13 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import com.dsc.housemarket.Models.User;
 import com.dsc.housemarket.Repository.FeatureRepository;
+import com.dsc.housemarket.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,10 +28,12 @@ import com.dsc.housemarket.Repository.PropertyRepository;
 public class PropertyController {
 
 	private final PropertyRepository propertiesDAO;
+	private final UserRepository userDAO;
 
 	@Autowired
-	public PropertyController(PropertyRepository propertiesDAO, FeatureRepository featureDAO) {
+	public PropertyController(PropertyRepository propertiesDAO, FeatureRepository featureDAO, UserRepository userDAO) {
 		this.propertiesDAO = propertiesDAO;
+		this.userDAO = userDAO;
 	}
 
 	@GetMapping
@@ -49,7 +54,23 @@ public class PropertyController {
 		Optional <Property> currentProperty = propertiesDAO.findByName(property.getName());
 		if(currentProperty.isPresent())
 				return new ResponseEntity<>(" -- > Already Registered Property < --", HttpStatus.BAD_REQUEST);
-		return new ResponseEntity<>(propertiesDAO.save(property), HttpStatus.CREATED);
+
+		Object userData = getUserData();
+
+		property.setCreator(userData.toString());
+
+		Property savedProperty = propertiesDAO.save(property);
+
+		if(savedProperty != null){
+			Optional<User> user = userDAO.findByEmail(userData.toString());
+			user.get().addProperty(savedProperty);
+			userDAO.save(user.get());
+			return new ResponseEntity<>("OK", HttpStatus.CREATED);
+		}
+
+		return new ResponseEntity<>("Error", HttpStatus.UNPROCESSABLE_ENTITY);
+
+
 	}
 	
 	@PutMapping("/{id}")
@@ -95,5 +116,10 @@ public class PropertyController {
 		propertiesDAO.deleteById(id);
 
 		return new ResponseEntity<>("The Property has been deleted", HttpStatus.OK);
+	}
+
+	private Object getUserData(){
+		Object user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return user;
 	}
 }
