@@ -5,7 +5,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 @Entity
-public class Property extends AbstractEntity {
+public class Property {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,12 +40,12 @@ public class Property extends AbstractEntity {
     @NotEmpty
     private String creator;
 
-    public String getCreator() {
-        return creator;
+    public long getId() {
+        return id;
     }
 
-    public void setCreator(String creator) {
-        this.creator = creator;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -72,12 +72,12 @@ public class Property extends AbstractEntity {
         this.description = description;
     }
 
-    public String getSuperdescription() {
+    public String getSuperDescription() {
         return superDescription;
     }
 
-    public void setSuperdescription(String superdescription) {
-        this.superDescription = superdescription;
+    public void setSuperDescription(String superDescription) {
+        this.superDescription = superDescription;
     }
 
     public Feature getFeatures() {
@@ -96,22 +96,11 @@ public class Property extends AbstractEntity {
         this.photos = photos;
     }
 
-    @Override
-    public long getId() {
-        return id;
+    public String getCreator() {
+        return creator;
     }
 
-    @Override
-    public void setId(long id) {
-        this.id = id;
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
-
-    public String getSuperDescription() {
-        return superDescription;
-    }
-
-    public void setSuperDescription(String superDescription) {
-        this.superDescription = superDescription;
-    }
-
 }

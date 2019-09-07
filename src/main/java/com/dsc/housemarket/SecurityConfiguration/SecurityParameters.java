@@ -6,4 +6,5 @@ public class SecurityParameters {
     static final String HEADER_STRING = "Authorization";
     static final String SIGNUP_URL = "/login";
     static final int EXPIRATION_TIME = 86400000;
+    static final String CSRF_NAME = "XSRF-Token";
 }

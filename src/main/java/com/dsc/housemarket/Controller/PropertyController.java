@@ -96,8 +96,8 @@ public class PropertyController {
 		if (propertyRequest.getDescription() != null) {
 			existsProperty.get().setDescription(propertyRequest.getDescription());
 		}
-		if (propertyRequest.getSuperdescription() != null) {
-			existsProperty.get().setSuperdescription(propertyRequest.getSuperdescription());
+		if (propertyRequest.getSuperDescription() != null) {
+			existsProperty.get().setSuperDescription(propertyRequest.getSuperDescription());
 		}
 
 		propertiesDAO.save(existsProperty.get());

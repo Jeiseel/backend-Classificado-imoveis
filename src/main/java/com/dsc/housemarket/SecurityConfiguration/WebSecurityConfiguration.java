@@ -8,9 +8,12 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
+import static com.dsc.housemarket.SecurityConfiguration.SecurityParameters.CSRF_NAME;
 import static com.dsc.housemarket.SecurityConfiguration.SecurityParameters.SIGNUP_URL;
 
 @EnableWebSecurity
@@ -22,8 +25,24 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception{
-		http.cors().and().csrf().disable().authorizeRequests()
 
+		// Cross-Site Request Forgery Token
+		http
+				.addFilterAfter(new CSRFTokenFilter(), CsrfFilter.class)
+				.csrf()
+					.csrfTokenRepository(csrfTokenRepository())
+					.ignoringAntMatchers("/login")
+
+				.and()
+				.authorizeRequests()
+					.antMatchers("/**");
+
+
+		// Cross-Origin Resource Sharing
+		http.cors().disable();
+
+		// Request Authorization
+		http.authorizeRequests()
 				// Login Page
 				.antMatchers(HttpMethod.GET, SIGNUP_URL).permitAll()
 
@@ -53,11 +72,16 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
 
 		// Permit Access h2-console via Browser
 		http.headers().frameOptions().disable();
-
 	}
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(customUserDetailService).passwordEncoder(new BCryptPasswordEncoder());
+	}
+
+	private CsrfTokenRepository csrfTokenRepository() {
+		HttpSessionCsrfTokenRepository repository = new HttpSessionCsrfTokenRepository();
+		repository.setHeaderName(CSRF_NAME);
+		return repository;
 	}
 }

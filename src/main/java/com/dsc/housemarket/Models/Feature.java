@@ -5,7 +5,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 @Entity
-public class Feature extends AbstractEntity {
+public class Feature extends AbstractEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +21,14 @@ public class Feature extends AbstractEntity {
 
     @Column
     private int rooms;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public String getType() {
         return type;
@@ -44,16 +52,6 @@ public class Feature extends AbstractEntity {
 
     public void setRooms(int rooms) {
         this.rooms = rooms;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(long id) {
-        this.id = id;
     }
 }
 

@@ -29,7 +29,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
-        Cookie cookie = getCookieFromRequest(request);
+        Cookie cookie = getCookieFromRequest(request, HEADER_STRING);
 
         if(cookie == null){
             chain.doFilter(request, response);
@@ -44,7 +44,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     private UsernamePasswordAuthenticationToken getAuthenticationToken(HttpServletRequest request){
 
-        Cookie cookie = getCookieFromRequest(request);
+        Cookie cookie = getCookieFromRequest(request, HEADER_STRING);
 
         if(cookie == null) return null;
 
@@ -60,7 +60,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                 : null;
     }
 
-    private Cookie getCookieFromRequest(HttpServletRequest request){
+    static Cookie getCookieFromRequest(HttpServletRequest request, String name){
         Cookie[] cookies = request.getCookies();
 
         if(cookies == null) return null;
@@ -68,7 +68,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         Cookie cookie = null;
 
         for (Cookie cks: cookies) {
-            if(cks.getName().equals(HEADER_STRING)) {
+            if(cks.getName().equals(name)) {
                 cookie = cks;
             }
         }
