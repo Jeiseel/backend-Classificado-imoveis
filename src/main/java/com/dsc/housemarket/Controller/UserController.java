@@ -21,7 +21,7 @@ import com.dsc.housemarket.Models.User;
 import com.dsc.housemarket.Repository.UserRepository;
 
 @RestController
-@RequestMapping("user")
+@RequestMapping("api")
 public class UserController {
 
 	private final UserRepository userDAO;
@@ -29,7 +29,7 @@ public class UserController {
 	@Autowired
 	public UserController(UserRepository userDAO) { this.userDAO = userDAO;	}
 
-	@GetMapping
+	@GetMapping("/user/all")
 	public ResponseEntity<?> listAll(){
 
 		Iterable<User> users = userDAO.findAll();
@@ -39,14 +39,14 @@ public class UserController {
 		return new ResponseEntity<>(users, HttpStatus.OK);
 	}
 	
-	@GetMapping("/{id}")
+	@GetMapping("/user/{id}")
 	public ResponseEntity<?> searchById(@PathVariable long id){
 		Optional<User> user = userDAO.findById(id);
 		if(!user.equals(Optional.empty())) { return new ResponseEntity<>(user, HttpStatus.OK); }
 		return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
 	}
 	
-	@PostMapping
+	@PostMapping("/signup")
 	public ResponseEntity<?> addUser(@RequestBody User user) {
 		Optional<User> currentUser = userDAO.findByEmail(user.getEmail());
 		if(!currentUser.equals(Optional.empty()))
@@ -60,7 +60,7 @@ public class UserController {
 		return new ResponseEntity<>(userDAO.save(user), HttpStatus.CREATED);
 	}
 	
-	@PutMapping("/{id}")
+	@PutMapping("/user/{id}")
 	public ResponseEntity<?> updateUser(@PathVariable("id") long id, @Valid @RequestBody User userRequest) {
 		Optional<User> existingUser = userDAO.findById(id);
 		if(existingUser.equals(Optional.empty())) {
@@ -84,7 +84,7 @@ public class UserController {
 		return new ResponseEntity<>("User has been updated", HttpStatus.OK);
 	}
 	
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/user/{id}")
 	public ResponseEntity<?> deleteUSer(@PathVariable long id){
 
 		Boolean existsUser = userDAO.existsById(id);

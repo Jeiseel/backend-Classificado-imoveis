@@ -32,6 +32,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
 				.csrf()
 					.csrfTokenRepository(csrfTokenRepository())
 					.ignoringAntMatchers("/login")
+					.ignoringAntMatchers("/api/signup")
 
 				.and()
 				.authorizeRequests()
@@ -44,19 +45,20 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
 		// Request Authorization
 		http.authorizeRequests()
 				// Login Page
+				.antMatchers(HttpMethod.POST, SIGNUP_URL).permitAll()
 				.antMatchers(HttpMethod.GET, SIGNUP_URL).permitAll()
 
 				// User Endpoint
-				.antMatchers(HttpMethod.GET, "/user/**").permitAll()
-				.antMatchers(HttpMethod.POST, "/user/**").authenticated()
-				.antMatchers(HttpMethod.PUT, "/user/**").authenticated()
-				.antMatchers(HttpMethod.DELETE, "/user/**").authenticated()
+				.antMatchers(HttpMethod.GET, "**/user/**").permitAll()
+				.antMatchers(HttpMethod.POST, "**/user/**").authenticated()
+				.antMatchers(HttpMethod.PUT, "**/user/**").authenticated()
+				.antMatchers(HttpMethod.DELETE, "**/user/**").authenticated()
 
 				// Property Endpoint
 				.antMatchers(HttpMethod.GET, "/property/**").permitAll()
 				.antMatchers(HttpMethod.POST, "/property/**").authenticated()
-				.antMatchers(HttpMethod.PUT, "/user/**").authenticated()
-				.antMatchers(HttpMethod.DELETE, "/user/**").authenticated()
+				.antMatchers(HttpMethod.PUT, "/property/**").authenticated()
+				.antMatchers(HttpMethod.DELETE, "/property/**").authenticated()
 
 				// Feature Endpoint
 				.antMatchers(HttpMethod.GET, "/feature/**").permitAll()

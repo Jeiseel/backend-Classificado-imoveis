@@ -10,7 +10,6 @@ import com.dsc.housemarket.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dsc.housemarket.Models.Property;
 import com.dsc.housemarket.Repository.PropertyRepository;
+
+import static com.dsc.housemarket.Utils.UserUtils.*;
 
 @RestController
 @RequestMapping("/property")
@@ -81,6 +82,10 @@ public class PropertyController {
 			return new ResponseEntity<>("This Property Don't exists", HttpStatus.NOT_FOUND);
 		}
 
+		Boolean isOwner = VerifyIfUserOfRequestIsCreatorOfProperty(existsProperty.get());
+
+		if(!isOwner) { return new ResponseEntity<>("You not are the Owner of this property", HttpStatus.FORBIDDEN); }
+
 		if (propertyRequest.getName() != null) {
 			existsProperty.get().setName(propertyRequest.getName());
 		}
@@ -109,17 +114,17 @@ public class PropertyController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteProperty(@PathVariable long id){
 
-		Boolean existsProperty = propertiesDAO.existsById(id);
+		Optional<Property> existsProperty = propertiesDAO.findById(id);
 
-		if(!existsProperty) { return new ResponseEntity<>("This Property don't exists", HttpStatus.NOT_FOUND); }
+		if(existsProperty.equals(Optional.empty())) { return new ResponseEntity<>("This Property don't exists", HttpStatus.NOT_FOUND); }
 
-		propertiesDAO.deleteById(id);
+		Boolean isOwner = VerifyIfUserOfRequestIsCreatorOfProperty(existsProperty.get());
+
+		if(!isOwner) { return new ResponseEntity<>("You not are the Owner of this property", HttpStatus.FORBIDDEN); }
+
+		propertiesDAO.delete(existsProperty.get());
+		//propertiesDAO.deleteById(id);
 
 		return new ResponseEntity<>("The Property has been deleted", HttpStatus.OK);
-	}
-
-	private Object getUserData(){
-		Object user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		return user;
 	}
 }

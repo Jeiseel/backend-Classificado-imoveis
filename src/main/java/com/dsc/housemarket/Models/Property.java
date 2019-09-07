@@ -37,7 +37,6 @@ public class Property {
     private String photos;
 
     @Column
-    @NotEmpty
     private String creator;
 
     public long getId() {
