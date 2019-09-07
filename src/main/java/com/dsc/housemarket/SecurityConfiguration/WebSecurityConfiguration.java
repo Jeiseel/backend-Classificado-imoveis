@@ -9,8 +9,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static com.dsc.housemarket.SecurityConfiguration.SecurityParameters.SIGNUP_URL;
 
@@ -24,13 +22,32 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
 	@Override
 	public void configure(HttpSecurity http) throws Exception{
 		http.cors().and().csrf().disable().authorizeRequests()
+
+				// Login Page
 				.antMatchers(HttpMethod.GET, SIGNUP_URL).permitAll()
-				.antMatchers(HttpMethod.POST, "/user").hasRole("USER")
-				.antMatchers(HttpMethod.GET, "/user").hasRole("ADMIN")
+
+				// User Endpoint
+				.antMatchers(HttpMethod.POST, "/user/**").authenticated()
+				.antMatchers(HttpMethod.PUT, "/user/**").authenticated()
+				.antMatchers(HttpMethod.DELETE, "/user/**").authenticated()
+
+				// Property Endpoint
+				.antMatchers(HttpMethod.POST, "/property/**").authenticated()
+				.antMatchers(HttpMethod.PUT, "/user/**").authenticated()
+				.antMatchers(HttpMethod.DELETE, "/user/**").authenticated()
+
+				// Feature Endpoint
+				.antMatchers(HttpMethod.POST, "/feature/**").authenticated()
+				.antMatchers(HttpMethod.PUT, "/feature/**").authenticated()
+				.antMatchers(HttpMethod.DELETE, "/feature/**").authenticated()
+
 				.and()
+
+				// Authentication and Authorization Middleware
 				.addFilter(new JWTAuthenticationFilter(authenticationManager()))
 				.addFilter(new JWTAuthorizationFilter(authenticationManager(), customUserDetailService));
 
+		// Permit Access h2-console via Browser
 		http.headers().frameOptions().disable();
 
 	}

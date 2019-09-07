@@ -25,8 +25,7 @@ import com.dsc.housemarket.Models.Feature;
 import com.dsc.housemarket.Repository.FeatureRepository;
 
 @RestController
-@RequestMapping("/feature")
-@CrossOrigin(origins = "*")
+@RequestMapping("feature")
 public class FeatureController {
 
 	@Autowired
@@ -46,7 +45,7 @@ public class FeatureController {
 		return features.save(feature);
 	}
 	
-	@PutMapping("/feature/{feature_id}")
+	@PutMapping("/{feature_id}")
 	public Feature updateFeature(@PathVariable long feature_id, @Valid @RequestBody Feature featureRequest) {
 		return (Feature) features.findById(feature_id).map(feature -> {
 			feature.setArea(feature.getArea());
@@ -57,7 +56,7 @@ public class FeatureController {
 	}
 	
 	
-	@DeleteMapping("/feature/{feature_id}")
+	@DeleteMapping("/{feature_id}")
 	public ResponseEntity<?> deleteFeature(@PathVariable long id){
 		return features.findById(id).map(feature -> {features.delete(feature); return ResponseEntity.ok().build();
 				}).orElseThrow(() -> new ResourceNotFoundException("ID" + id + "não encontrado"));
