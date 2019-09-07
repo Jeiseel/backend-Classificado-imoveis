@@ -43,6 +43,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     }
 
     private UsernamePasswordAuthenticationToken getAuthenticationToken(HttpServletRequest request){
+
         Cookie cookie = getCookieFromRequest(request);
 
         if(cookie == null) return null;
@@ -61,6 +62,8 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     private Cookie getCookieFromRequest(HttpServletRequest request){
         Cookie[] cookies = request.getCookies();
+
+        if(cookies == null) return null;
 
         Cookie cookie = null;
 

@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import static com.dsc.housemarket.SecurityConfiguration.SecurityParameters.SIGNUP_URL;
@@ -27,16 +28,19 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
 				.antMatchers(HttpMethod.GET, SIGNUP_URL).permitAll()
 
 				// User Endpoint
+				.antMatchers(HttpMethod.GET, "/user/**").permitAll()
 				.antMatchers(HttpMethod.POST, "/user/**").authenticated()
 				.antMatchers(HttpMethod.PUT, "/user/**").authenticated()
 				.antMatchers(HttpMethod.DELETE, "/user/**").authenticated()
 
 				// Property Endpoint
+				.antMatchers(HttpMethod.GET, "/property/**").permitAll()
 				.antMatchers(HttpMethod.POST, "/property/**").authenticated()
 				.antMatchers(HttpMethod.PUT, "/user/**").authenticated()
 				.antMatchers(HttpMethod.DELETE, "/user/**").authenticated()
 
 				// Feature Endpoint
+				.antMatchers(HttpMethod.GET, "/feature/**").permitAll()
 				.antMatchers(HttpMethod.POST, "/feature/**").authenticated()
 				.antMatchers(HttpMethod.PUT, "/feature/**").authenticated()
 				.antMatchers(HttpMethod.DELETE, "/feature/**").authenticated()
