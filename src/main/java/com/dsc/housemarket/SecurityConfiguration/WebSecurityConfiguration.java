@@ -21,23 +21,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
 	@Autowired
 	private CustomUserDetailService customUserDetailService;
 
-	/*
-	@Override
-	public void configure(HttpSecurity http) throws Exception{
-
-		http.authorizeRequests()
-				.anyRequest().authenticated()
-				.and()
-				.httpBasic()
-				.and()
-				.csrf().disable();
-
-		http.headers().frameOptions().disable();
-
-	}
-
-	 */
-
 	@Override
 	public void configure(HttpSecurity http) throws Exception{
 		http.cors().and().csrf().disable().authorizeRequests()

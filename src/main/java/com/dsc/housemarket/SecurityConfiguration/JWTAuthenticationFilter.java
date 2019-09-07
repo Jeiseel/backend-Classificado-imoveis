@@ -50,7 +50,17 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
 
-        response.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
+        Cookie cookie = createAuthenticationCookie(token, request.isSecure());
+
+        response.addCookie(cookie);
     }
 
+    private Cookie createAuthenticationCookie(String cookieValue, Boolean isSecure) {
+        Cookie authenticationCookie = new Cookie(HEADER_STRING, cookieValue);
+        authenticationCookie.setPath("/");
+        authenticationCookie.setHttpOnly(true);
+        authenticationCookie.setSecure(isSecure);
+        authenticationCookie.setMaxAge(EXPIRATION_TIME);
+        return authenticationCookie;
+    }
 }
