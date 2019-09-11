@@ -43,28 +43,30 @@ public class UserController {
 	public ResponseEntity<?> searchById(@PathVariable long id){
 		Optional<User> user = userDAO.findById(id);
 		if(!user.equals(Optional.empty())) { return new ResponseEntity<>(user, HttpStatus.OK); }
-		return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
+		return new ResponseEntity<String>("Not Found", HttpStatus.NOT_FOUND);
 	}
 	
 	@PostMapping("/signup")
 	public ResponseEntity<?> addUser(@RequestBody User user) {
 		Optional<User> currentUser = userDAO.findByEmail(user.getEmail());
 		if(!currentUser.equals(Optional.empty()))
-				return new ResponseEntity<>("The Email is already Registered", HttpStatus.UNPROCESSABLE_ENTITY);
+				return new ResponseEntity<String>("The Email is already Registered", HttpStatus.UNPROCESSABLE_ENTITY);
 
 		String passwdEncrypted = PasswordEncoder.encodePassword(user.getPassword());
 		user.setPassword(passwdEncrypted);
 
 		user.setAdmin(false);
 
-		return new ResponseEntity<>(userDAO.save(user), HttpStatus.CREATED);
+		userDAO.save(user);
+
+		return new ResponseEntity<String>("Account Created", HttpStatus.CREATED);
 	}
 	
 	@PutMapping("/user/{id}")
-	public ResponseEntity<?> updateUser(@PathVariable("id") long id, @Valid @RequestBody User userRequest) {
+	public ResponseEntity<String> updateUser(@PathVariable("id") long id, @Valid @RequestBody User userRequest) {
 		Optional<User> existingUser = userDAO.findById(id);
 		if(existingUser.equals(Optional.empty())) {
-			return new ResponseEntity<>("This User Don't exists", HttpStatus.NOT_FOUND);
+			return new ResponseEntity<String>("This User Don't exists", HttpStatus.NOT_FOUND);
 		}
 
 		if (userRequest.getName() != null) {
@@ -81,18 +83,18 @@ public class UserController {
 
 		userDAO.save(existingUser.get());
 
-		return new ResponseEntity<>("User has been updated", HttpStatus.OK);
+		return new ResponseEntity<String>("User has been updated", HttpStatus.OK);
 	}
 	
 	@DeleteMapping("/user/{id}")
-	public ResponseEntity<?> deleteUSer(@PathVariable long id){
+	public ResponseEntity<String> deleteUSer(@PathVariable long id){
 
 		Boolean existsUser = userDAO.existsById(id);
 
-		if(!existsUser) { return new ResponseEntity<>("This User don't exists", HttpStatus.NOT_FOUND); }
+		if(!existsUser) { return new ResponseEntity<String>("This User don't exists", HttpStatus.NOT_FOUND); }
 
 		userDAO.deleteById(id);
 
-		return new ResponseEntity<>("The User has been deleted", HttpStatus.OK);
+		return new ResponseEntity<String>("The User has been deleted", HttpStatus.OK);
 	}
 }

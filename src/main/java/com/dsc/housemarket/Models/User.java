@@ -85,4 +85,6 @@ public class User {
 	public void addProperty(Property property) {
 		this.propertyList.add(property);
 	}
+
+	public void removeProperty(Property property) { this.propertyList.remove(property); }
 }

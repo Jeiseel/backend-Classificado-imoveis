@@ -26,6 +26,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
 	@Override
 	public void configure(HttpSecurity http) throws Exception{
 
+		/*
 		// Cross-Site Request Forgery Token
 		http
 				.addFilterAfter(new CSRFTokenFilter(), CsrfFilter.class)
@@ -37,10 +38,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
 				.and()
 				.authorizeRequests()
 					.antMatchers("/**");
-
+		 */
 
 		// Cross-Origin Resource Sharing
-		http.cors().disable();
+		http.cors().and().csrf().disable();
 
 		// Request Authorization
 		http.authorizeRequests()
