@@ -43,7 +43,7 @@ public class FeatureController {
 	private List<Feature>list(){
 		return featureDAO.findAll();
 	}
-	
+
 	@PostMapping("/feature/new/{property_id}")
 	public ResponseEntity<String> addFeature(@PathVariable long property_id, @RequestBody Feature feature) {
 		Optional<Property> property = propertyDAO.findById(property_id);
@@ -63,7 +63,7 @@ public class FeatureController {
 		return new ResponseEntity<String>("Feature Added", HttpStatus.CREATED);
 
 	}
-	
+
 	@PutMapping("/{feature_id}")
 	public Feature updateFeature(@PathVariable long feature_id, @Valid @RequestBody Feature featureRequest) {
 		return (Feature) featureDAO.findById(feature_id).map(feature -> {
@@ -73,33 +73,33 @@ public class FeatureController {
 			return featureDAO.save(feature);
 		}).orElseThrow(() -> new ResourceNotFoundException("Feature ID" + feature_id + "Não foi encontrado ou não existe!"));
 	}
-	
-	
+
+
 	@DeleteMapping("/{feature_id}")
 	public ResponseEntity<?> deleteFeature(@PathVariable long id){
 		return featureDAO.findById(id).map(feature -> {featureDAO.delete(feature); return ResponseEntity.ok().build();
 				}).orElseThrow(() -> new ResourceNotFoundException("ID" + id + "não encontrado"));
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

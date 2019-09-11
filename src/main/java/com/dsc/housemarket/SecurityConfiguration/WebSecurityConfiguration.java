@@ -26,7 +26,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
 	@Override
 	public void configure(HttpSecurity http) throws Exception{
 
-		/*
+
 		// Cross-Site Request Forgery Token
 		http
 				.addFilterAfter(new CSRFTokenFilter(), CsrfFilter.class)
@@ -34,20 +34,27 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
 					.csrfTokenRepository(csrfTokenRepository())
 					.ignoringAntMatchers("/login")
 					.ignoringAntMatchers("/api/signup")
+					.ignoringAntMatchers("/h2-console/**")
 
 				.and()
 				.authorizeRequests()
+					.antMatchers("/h2-console/**")
+					.permitAll()
 					.antMatchers("/**");
-		 */
+
 
 		// Cross-Origin Resource Sharing
-		http.cors().and().csrf().disable();
+		http.cors().disable();
 
 		// Request Authorization
 		http.authorizeRequests()
 				// Login Page
 				.antMatchers(HttpMethod.POST, SIGNUP_URL).permitAll()
 				.antMatchers(HttpMethod.GET, SIGNUP_URL).permitAll()
+
+				// H2-console
+				.antMatchers(HttpMethod.GET, "/h2-console/**").permitAll()
+				.antMatchers(HttpMethod.POST, "/h2-console/**").permitAll()
 
 				// User Endpoint
 				.antMatchers(HttpMethod.GET, "**/user/**").permitAll()
@@ -56,16 +63,16 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
 				.antMatchers(HttpMethod.DELETE, "**/user/**").authenticated()
 
 				// Property Endpoint
-				.antMatchers(HttpMethod.GET, "/property/**").permitAll()
-				.antMatchers(HttpMethod.POST, "/property/**").authenticated()
-				.antMatchers(HttpMethod.PUT, "/property/**").authenticated()
-				.antMatchers(HttpMethod.DELETE, "/property/**").authenticated()
+				.antMatchers(HttpMethod.GET, "**/property/**").permitAll()
+				.antMatchers(HttpMethod.POST, "**/property/**").authenticated()
+				.antMatchers(HttpMethod.PUT, "**/property/**").authenticated()
+				.antMatchers(HttpMethod.DELETE, "**/property/**").authenticated()
 
 				// Feature Endpoint
-				.antMatchers(HttpMethod.GET, "/feature/**").permitAll()
-				.antMatchers(HttpMethod.POST, "/feature/**").authenticated()
-				.antMatchers(HttpMethod.PUT, "/feature/**").authenticated()
-				.antMatchers(HttpMethod.DELETE, "/feature/**").authenticated()
+				.antMatchers(HttpMethod.GET, "**/feature/**").permitAll()
+				.antMatchers(HttpMethod.POST, "**/feature/**").authenticated()
+				.antMatchers(HttpMethod.PUT, "**/feature/**").authenticated()
+				.antMatchers(HttpMethod.DELETE, "**/feature/**").authenticated()
 
 				.and()
 

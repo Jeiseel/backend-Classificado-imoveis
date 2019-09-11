@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import com.dsc.housemarket.Repository.FeatureRepository;
+import com.dsc.housemarket.Repository.PropertyRepository;
 import com.dsc.housemarket.SecurityConfiguration.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,14 +22,22 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dsc.housemarket.Models.User;
 import com.dsc.housemarket.Repository.UserRepository;
 
+import static com.dsc.housemarket.Utils.UserUtils.getUserData;
+
 @RestController
 @RequestMapping("api")
 public class UserController {
 
 	private final UserRepository userDAO;
+	private final PropertyRepository propertyDAO;
+	private final FeatureRepository featureDAO;
 
 	@Autowired
-	public UserController(UserRepository userDAO) { this.userDAO = userDAO;	}
+	public UserController(UserRepository userDAO, PropertyRepository propertyDAO, FeatureRepository featureDAO) {
+	    this.userDAO = userDAO;
+        this.propertyDAO = propertyDAO;
+        this.featureDAO = featureDAO;
+    }
 
 	@GetMapping("/user/all")
 	public ResponseEntity<?> listAll(){
@@ -66,8 +76,14 @@ public class UserController {
 	public ResponseEntity<String> updateUser(@PathVariable("id") long id, @Valid @RequestBody User userRequest) {
 		Optional<User> existingUser = userDAO.findById(id);
 		if(existingUser.equals(Optional.empty())) {
-			return new ResponseEntity<String>("This User Don't exists", HttpStatus.NOT_FOUND);
+			return new ResponseEntity<String>("You don't have permission", HttpStatus.UNPROCESSABLE_ENTITY);
 		}
+
+        Object userData = getUserData();
+
+		if(!existingUser.get().getEmail().equals(userData)) {
+            return new ResponseEntity<String>("You don't have permission", HttpStatus.UNPROCESSABLE_ENTITY);
+        }
 
 		if (userRequest.getName() != null) {
 			existingUser.get().setName(userRequest.getName());
@@ -89,9 +105,16 @@ public class UserController {
 	@DeleteMapping("/user/{id}")
 	public ResponseEntity<String> deleteUSer(@PathVariable long id){
 
-		Boolean existsUser = userDAO.existsById(id);
+        Optional<User> existingUser = userDAO.findById(id);
+        if(existingUser.equals(Optional.empty())) {
+            return new ResponseEntity<String>("You don't have permission", HttpStatus.UNPROCESSABLE_ENTITY);
+        }
 
-		if(!existsUser) { return new ResponseEntity<String>("This User don't exists", HttpStatus.NOT_FOUND); }
+        Object userData = getUserData();
+
+        if(!existingUser.get().getEmail().equals(userData)) {
+            return new ResponseEntity<String>("You don't have permission", HttpStatus.UNPROCESSABLE_ENTITY);
+        }
 
 		userDAO.deleteById(id);
 

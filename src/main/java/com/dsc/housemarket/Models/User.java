@@ -25,7 +25,7 @@ public class User {
 	private String phone;
 
 	@Column
-	@ManyToMany
+	@OneToMany(cascade = CascadeType.REMOVE)
 	private List<Property> propertyList;
 
 	private boolean admin = false;

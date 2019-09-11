@@ -3,6 +3,7 @@ package com.dsc.housemarket.Models;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 public class Property {
@@ -29,7 +30,8 @@ public class Property {
     @Column
     private String superDescription;
 
-    @Column
+    @JoinColumn
+    @OneToOne(cascade = CascadeType.REMOVE)
     private Feature features;
 
     @Column

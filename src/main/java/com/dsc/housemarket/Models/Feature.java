@@ -5,7 +5,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 @Entity
-public class Feature extends AbstractEntity{
+public class Feature {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

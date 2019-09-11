@@ -84,7 +84,7 @@ public class PropertyController {
 		Optional<Property> existsProperty = propertiesDAO.findById(id);
 
 		if(existsProperty.equals(Optional.empty())) {
-			return new ResponseEntity<String>("This Property Don't exists", HttpStatus.NOT_FOUND);
+			return new ResponseEntity<String>("You not are the Owner of this property", HttpStatus.FORBIDDEN);
 		}
 
 		Boolean isOwner = VerifyIfUserOfRequestIsCreatorOfProperty(existsProperty.get());
@@ -97,11 +97,11 @@ public class PropertyController {
 		if (propertyRequest.getPhotos() != null) {
 			existsProperty.get().setPhotos(propertyRequest.getPhotos());
 		}
-		/*
+
 		if (propertyRequest.getFeatures() != null) {
 			existsProperty.get().setFeatures(propertyRequest.getFeatures());
 		}
-		 */
+
 		if (propertyRequest.getValue() == 0.0f) {
 			existsProperty.get().setValue(propertyRequest.getValue());
 		}
@@ -128,8 +128,6 @@ public class PropertyController {
 		Boolean isOwner = VerifyIfUserOfRequestIsCreatorOfProperty(existsProperty.get());
 
 		if(!isOwner) { return new ResponseEntity<String>("You not are the Owner of this property", HttpStatus.FORBIDDEN); }
-
-		featureDAO.delete(existsProperty.get().getFeatures());
 
 		Optional<User> propertyOwner = userDAO.findByEmail(existsProperty.get().getCreator());
 
