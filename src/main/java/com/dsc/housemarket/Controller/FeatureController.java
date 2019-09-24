@@ -80,7 +80,7 @@ public class FeatureController {
 	@DeleteMapping("/feature/{feature_id}")
 	public ResponseEntity<?> deleteFeature(@PathVariable long id){
 		return featureDAO.findById(id).map(feature -> {featureDAO.delete(feature); return ResponseEntity.ok().build();
-				}).orElseThrow(() -> new ResourceNotFoundException("ID" + id + "não encontrado"));
+		}).orElseThrow(() -> new ResourceNotFoundException("ID" + id + "não encontrado"));
 	}
 
 
