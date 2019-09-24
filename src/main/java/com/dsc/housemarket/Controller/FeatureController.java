@@ -7,6 +7,7 @@ import javax.validation.Valid;
 
 import com.dsc.housemarket.Models.Property;
 import com.dsc.housemarket.Repository.PropertyRepository;
+import com.dsc.housemarket.RepositoryImplementation.FeatureRepositoryImplementation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,10 @@ import static com.dsc.housemarket.Utils.UserUtils.VerifyIfUserOfRequestIsCreator
 @RequestMapping("api")
 public class FeatureController {
 
+	@Autowired
+	private FeatureRepositoryImplementation featureRepositoryImplementation;
+
+
 	private final FeatureRepository featureDAO;
 	private final PropertyRepository propertyDAO;
 
@@ -40,42 +45,39 @@ public class FeatureController {
 	}
 
 	@GetMapping("/feature/all")
-	private List<Feature>list(){
-		return featureDAO.findAll();
+	private ResponseEntity<Iterable<Feature>> listAll(){
+		return new ResponseEntity<Iterable<Feature>>(featureDAO.findAll(), HttpStatus.OK);
+	}
+
+	@GetMapping("/feature/all/{id}")
+	private ResponseEntity<?> getProperty(@PathVariable long id){
+
+		Optional<Feature> feature = featureRepositoryImplementation.getFeatureById(id);
+		if(!feature.equals(Optional.empty())) { return new ResponseEntity<Feature>(feature.get(), HttpStatus.OK); }
+		return new ResponseEntity<String>("", HttpStatus.NOT_FOUND);
+
 	}
 
 	@PostMapping("/feature/new/{property_id}")
 	public ResponseEntity<String> addFeature(@PathVariable long property_id, @RequestBody Feature feature) {
-		Optional<Property> property = propertyDAO.findById(property_id);
-		if(property.equals(Optional.empty()))
-			return new ResponseEntity<String>("This property don't exists", HttpStatus.NOT_FOUND);
 
-		Boolean isOwner = VerifyIfUserOfRequestIsCreatorOfProperty(property.get());
+		Boolean hasCreated = featureRepositoryImplementation.createFeature(property_id, feature);
 
-		if(!isOwner) { return new ResponseEntity<String>("You not are the Owner of this property", HttpStatus.FORBIDDEN); }
-
-		Feature newFeature = featureDAO.save(feature);
-
-		property.get().setFeatures(newFeature);
-
-		propertyDAO.save(property.get());
+		if(!hasCreated) {
+			return new ResponseEntity<String>("Error", HttpStatus.UNPROCESSABLE_ENTITY);
+		}
 
 		return new ResponseEntity<String>("Feature Added", HttpStatus.CREATED);
 
 	}
 
-	@PutMapping("/{feature_id}")
+	@PutMapping("/feature/{feature_id}")
 	public Feature updateFeature(@PathVariable long feature_id, @Valid @RequestBody Feature featureRequest) {
-		return (Feature) featureDAO.findById(feature_id).map(feature -> {
-			feature.setArea(feature.getArea());
-			feature.setRooms(feature.getRooms());
-			feature.setType(feature.getType());
-			return featureDAO.save(feature);
-		}).orElseThrow(() -> new ResourceNotFoundException("Feature ID" + feature_id + "Não foi encontrado ou não existe!"));
+		return featureRepositoryImplementation.editFeature(feature_id, featureRequest);
 	}
 
 
-	@DeleteMapping("/{feature_id}")
+	@DeleteMapping("/feature/{feature_id}")
 	public ResponseEntity<?> deleteFeature(@PathVariable long id){
 		return featureDAO.findById(id).map(feature -> {featureDAO.delete(feature); return ResponseEntity.ok().build();
 				}).orElseThrow(() -> new ResourceNotFoundException("ID" + id + "não encontrado"));

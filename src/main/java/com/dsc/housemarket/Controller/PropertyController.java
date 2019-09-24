@@ -8,6 +8,8 @@ import com.dsc.housemarket.Models.Feature;
 import com.dsc.housemarket.Models.User;
 import com.dsc.housemarket.Repository.FeatureRepository;
 import com.dsc.housemarket.Repository.UserRepository;
+import com.dsc.housemarket.RepositoryImplementation.PropertyRepositoryImplementation;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,25 +31,17 @@ import static com.dsc.housemarket.Utils.UserUtils.*;
 @RequestMapping("api")
 public class PropertyController {
 
-	private final PropertyRepository propertiesDAO;
-	private final UserRepository userDAO;
-	private final FeatureRepository featureDAO;
-
 	@Autowired
-	public PropertyController(PropertyRepository propertiesDAO, FeatureRepository featureDAO, UserRepository userDAO, FeatureRepository featureDAO1, FeatureRepository featureDAO2) {
-		this.propertiesDAO = propertiesDAO;
-		this.userDAO = userDAO;
-		this.featureDAO = featureDAO2;
-	}
+	private PropertyRepositoryImplementation propertyRepositoryImplementation;
 
 	@GetMapping("/property/all")
-	public ResponseEntity<?> listAll(){
-		return new ResponseEntity<>(propertiesDAO.findAll(), HttpStatus.OK);
+	public ResponseEntity<Iterable<Property>> listAll(){
+		return new ResponseEntity<Iterable<Property>>(propertyRepositoryImplementation.getAllProperties(), HttpStatus.OK);
 	}
 	
 	@GetMapping("/property/{id}")
 	private ResponseEntity<?> seachById(@PathVariable long id){
-		Optional<Property> property = propertiesDAO.findById(id);
+		Optional<Property> property = propertyRepositoryImplementation.getPropertyById(id);
 		if(!property.equals(Optional.empty())) { return new ResponseEntity<>(property, HttpStatus.OK); }
 		return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
 	}
@@ -55,64 +49,24 @@ public class PropertyController {
 	@PostMapping("/property/new")
 	public ResponseEntity<String> addProperty(@RequestBody Property property) {
 
-		Optional <Property> currentProperty = propertiesDAO.findByName(property.getName());
-		if(currentProperty.isPresent())
-				return new ResponseEntity<String>("Property already exists", HttpStatus.BAD_REQUEST);
+		Boolean hasCreated = propertyRepositoryImplementation.createNewProperty(property);
 
-		Object userData = getUserData();
-
-		property.setCreator(userData.toString());
-
-		Feature newFeature = featureDAO.save(property.getFeatures());
-
-		property.setFeatures(newFeature);
-
-		Property savedProperty = propertiesDAO.save(property);
-
-		if(savedProperty != null){
-			Optional<User> user = userDAO.findByEmail(userData.toString());
-			user.get().addProperty(savedProperty);
-			userDAO.save(user.get());
-			return new ResponseEntity<String>("Property Created", HttpStatus.CREATED);
+		if(!hasCreated) {
+			return new ResponseEntity<String>("Property already exists", HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 
-		return new ResponseEntity<String>("Error", HttpStatus.UNPROCESSABLE_ENTITY);
+		return new ResponseEntity<String>("Property Created", HttpStatus.CREATED);
+
 	}
 	
 	@PutMapping("/property/{id}")
 	public ResponseEntity<String> updateProperty(@PathVariable long id, @Valid @RequestBody Property propertyRequest) {
-		Optional<Property> existsProperty = propertiesDAO.findById(id);
 
-		if(existsProperty.equals(Optional.empty())) {
+		Boolean hasEdited = propertyRepositoryImplementation.editProperty(id, propertyRequest);
+
+		if(!hasEdited) {
 			return new ResponseEntity<String>("You not are the Owner of this property", HttpStatus.FORBIDDEN);
 		}
-
-		Boolean isOwner = VerifyIfUserOfRequestIsCreatorOfProperty(existsProperty.get());
-
-		if(!isOwner) { return new ResponseEntity<String>("You not are the Owner of this property", HttpStatus.FORBIDDEN); }
-
-		if (propertyRequest.getName() != null) {
-			existsProperty.get().setName(propertyRequest.getName());
-		}
-		if (propertyRequest.getPhotos() != null) {
-			existsProperty.get().setPhotos(propertyRequest.getPhotos());
-		}
-
-		if (propertyRequest.getFeatures() != null) {
-			existsProperty.get().setFeatures(propertyRequest.getFeatures());
-		}
-
-		if (propertyRequest.getValue() == 0.0f) {
-			existsProperty.get().setValue(propertyRequest.getValue());
-		}
-		if (propertyRequest.getDescription() != null) {
-			existsProperty.get().setDescription(propertyRequest.getDescription());
-		}
-		if (propertyRequest.getSuperDescription() != null) {
-			existsProperty.get().setSuperDescription(propertyRequest.getSuperDescription());
-		}
-
-		propertiesDAO.save(existsProperty.get());
 
 		return new ResponseEntity<String>("Property has been updated", HttpStatus.OK);
 		
@@ -121,20 +75,11 @@ public class PropertyController {
 	@DeleteMapping("/property/{id}")
 	public ResponseEntity<String> deleteProperty(@PathVariable long id){
 
-		Optional<Property> existsProperty = propertiesDAO.findById(id);
+		Boolean hasDeleted = propertyRepositoryImplementation.deleteProperty(id);
 
-		if(existsProperty.equals(Optional.empty())) { return new ResponseEntity<>("This Property don't exists", HttpStatus.NOT_FOUND); }
-
-		Boolean isOwner = VerifyIfUserOfRequestIsCreatorOfProperty(existsProperty.get());
-
-		if(!isOwner) { return new ResponseEntity<String>("You not are the Owner of this property", HttpStatus.FORBIDDEN); }
-
-		Optional<User> propertyOwner = userDAO.findByEmail(existsProperty.get().getCreator());
-
-		propertyOwner.get().removeProperty(existsProperty.get());
-		userDAO.save(propertyOwner.get());
-
-		propertiesDAO.delete(existsProperty.get());
+		if(!hasDeleted) {
+			return new ResponseEntity<String>("You not are the Owner of this property", HttpStatus.FORBIDDEN);
+		}
 
 		return new ResponseEntity<String>("The Property has been deleted", HttpStatus.OK);
 	}

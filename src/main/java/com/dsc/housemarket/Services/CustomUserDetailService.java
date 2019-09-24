@@ -2,6 +2,7 @@ package com.dsc.housemarket.Services;
 
 import com.dsc.housemarket.Models.User;
 import com.dsc.housemarket.Repository.UserRepository;
+import com.dsc.housemarket.RepositoryImplementation.UserRepositoryImplementation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -16,18 +17,35 @@ import java.util.Optional;
 @Component
 public class CustomUserDetailService implements UserDetailsService {
 
+    /*
     private final UserRepository userDao;
 
     @Autowired
     public CustomUserDetailService(UserRepository userDao) {
         this.userDao = userDao;
     }
+     */
+
+    @Autowired
+    private UserRepositoryImplementation userRepositoryImplementation;
 
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        /*
         Optional<User> userOptional = Optional.ofNullable(userDao.findByEmail(username)).orElseThrow(() -> new UsernameNotFoundException("User not Found"));
-        User user = userOptional.get();
+
+         */
+
+        Optional<User> existsUser = userRepositoryImplementation.findByEmail(username);
+
+        System.out.println(existsUser.get().getEmail());
+
+        User user = null;
+
+        if(!existsUser.equals(Optional.empty())) {
+            user = existsUser.get();
+        }
 
         List<GrantedAuthority> authorityListAdmin = AuthorityUtils.createAuthorityList("ROLE_USER", "ROLE_ADMIN");
         List<GrantedAuthority> authorityListUser = AuthorityUtils.createAuthorityList("ROLE_USER");
