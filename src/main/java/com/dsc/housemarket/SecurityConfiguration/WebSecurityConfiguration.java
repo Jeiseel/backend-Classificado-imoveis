@@ -44,7 +44,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
 
 
 		// Cross-Origin Resource Sharing
-		http.cors().disable();
+		http.cors();
 
 		// Request Authorization
 		http.authorizeRequests()
