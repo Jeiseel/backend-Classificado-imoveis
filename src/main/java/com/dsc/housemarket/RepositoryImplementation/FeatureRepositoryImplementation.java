@@ -7,18 +7,22 @@ import com.dsc.housemarket.Repository.FeatureRepository;
 import com.dsc.housemarket.Repository.PropertyRepository;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 
 import static com.dsc.housemarket.Utils.UserUtils.VerifyIfUserOfRequestIsCreatorOfProperty;
 
+@Component
+@Primary
 public class FeatureRepositoryImplementation implements FeatureRepository {
 
     @Autowired

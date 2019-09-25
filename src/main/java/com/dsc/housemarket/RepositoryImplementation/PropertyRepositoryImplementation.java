@@ -8,14 +8,18 @@ import com.dsc.housemarket.Repository.PropertyRepository;
 import com.dsc.housemarket.Repository.UserRepository;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 import static com.dsc.housemarket.Utils.UserUtils.VerifyIfUserOfRequestIsCreatorOfProperty;
 import static com.dsc.housemarket.Utils.UserUtils.getUserData;
 
+@Component
+@Primary
 public class PropertyRepositoryImplementation implements PropertyRepository {
 
     @Autowired
